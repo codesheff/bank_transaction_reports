@@ -56,9 +56,16 @@ def load_data():
     Find all the transaction files and load them
     """
 
+    import re
+
     first_row = True
     for file in os.listdir("data"):
         # print(file)
+        # Going to skip non 2024 for now
+        if re.search("2024", file):
+            pass
+        else:
+            continue
         filepath = os.path.join("data", file)
         df_new = read_data_from_csv(file=filepath)
         if first_row:
@@ -76,12 +83,19 @@ def load_category_lookup():
     """
 
     # global category_lookup
+    line_number = 0
     try:
         with open("category_lookup.csv", newline="", encoding="utf-8") as csvfile:
             reader = csv.reader(csvfile, delimiter=",", quotechar='"')
             for row in reader:
-                description = row[0]
-                category = row[1]
+                line_number += 1
+
+                try:
+                    description = row[0]
+                    category = row[1]
+                except IndexError as e:
+                    print(f"Error on line {line_number} in category lookup file.")
+                    print(e)
 
                 category_lookup[description] = category
     except FileNotFoundError:
